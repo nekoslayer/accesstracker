@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Record Details</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
+            --bg: #f0f2f5; --surface: #ffffff; --text: #1c1c2e; --text-secondary: #4a5568;
+            --text-muted: #8892a4; --border: #e2e5ec; --border-light: #eef1f6;
+            --warn-bg: #fffbeb; --warn-text: #92400e; --warn-border: #fbbf24;
+            --radius: 8px; --radius-lg: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        html { font-size: 16px; }
+        body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; padding: 1.75rem 2rem;
+            box-shadow: 0 2px 12px rgba(218,33,40,0.2);
+        }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+        .page-header .subtitle { font-size: 0.88rem; opacity: 0.85; margin-top: 0.25rem; }
+
+        .container { margin: 0 auto; padding: 1.75rem 1.5rem; max-width: 760px; }
+
+        .meta {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;
+            background: var(--surface); padding: 0.75rem 1rem; border-radius: var(--radius);
+            box-shadow: var(--shadow-sm); border-left: 3px solid var(--primary);
+        }
+
+        .detail-section {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; box-shadow: var(--shadow);
+            position: relative; overflow: hidden;
+        }
+        .detail-section::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+        }
+        .detail-section h2 {
+            font-size: 0.82rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem;
+            padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light);
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+
+        dl { display: grid; grid-template-columns: 200px 1fr; gap: 0.6rem 1.25rem; }
+        dt { font-weight: 600; font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+        dd { font-size: 0.95rem; color: var(--text); }
+        .pre-wrap { white-space: pre-wrap; }
+
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
+        .badge-critical { background: var(--primary); color: #fff; }
+        .badge-high { background: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+        .badge-medium { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+        .badge-low { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+        .badge-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+
+        .form-actions { margin-top: 1.5rem; text-align: center; }
+        .btn {
+            display: inline-block; padding: 0.7rem 2rem; color: #fff; border: none; border-radius: var(--radius);
+            font-size: 1rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-back { background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 2px 8px rgba(71,85,105,0.2); }
+        .btn-back:hover { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); box-shadow: 0 4px 16px rgba(71,85,105,0.3); transform: translateY(-1px); }
+
+        @media (max-width: 768px) { dl { grid-template-columns: 1fr; gap: 0.25rem; } dt { margin-top: 0.5rem; } .detail-section { padding: 1.25rem; } .page-header { padding: 1.25rem 1rem; } .page-header h1 { font-size: 1.25rem; } }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>Access Record Details</h1>
+        <div class="subtitle">Full view of a submitted access record</div>
+    </div>
+
+    <div class="container" id="content"></div>
+
+    <script>
+        var records = {
+            "a1b2c3d4-e5f6-7890-abcd-ef1234567890": {
+                fullName:"Ahmet Yilmaz", username:"ayilmaz", department:"IT", jobTitle:"System Administrator",
+                systemName:"Azure DevOps", url:"https://dev.azure.com/company", category:"Dev Tool", accountType:"Individual",
+                accessType:"Admin", authMethod:"SSO",
+                businessReason:"Manage CI/CD pipelines, code repositories, and project boards for all engineering teams. Required for daily operations and release management.",
+                businessProcess:"Software Development Lifecycle", impact:"Critical",
+                secondaryName:"Mehmet Demir", secondaryEmail:"mdemir@company.com",
+                unavailPlan:"Mehmet Demir has equivalent admin access and can handle all DevOps operations. Documentation is in the IT wiki under DevOps Runbook.",
+                startDate:"2025-01-10", endDate:null, tempAccess:false,
+                criticality:"Critical", backup:"Break-glass account stored in IT vault",
+                notes:"Also manages service connections for production deployments.", createdAt:"2026-03-15 09:30"
+            },
+            "b2c3d4e5-f6a7-8901-bcde-f12345678901": {
+                fullName:"Elif Kaya", username:"ekaya", department:"Finance", jobTitle:"Financial Analyst",
+                systemName:"SAP ERP", url:"https://sap.company.local", category:"Finance", accountType:"Individual",
+                accessType:"Write", authMethod:"Username/Password",
+                businessReason:"Process monthly financial reports, manage accounts payable and receivable, and prepare quarterly audit documentation.",
+                businessProcess:"Financial Reporting & Audit Preparation", impact:"High",
+                secondaryName:"Zeynep Arslan", secondaryEmail:"zarslan@company.com",
+                unavailPlan:"Zeynep Arslan can run standard reports. For month-end close, escalate to Finance Director.",
+                startDate:"2025-06-01", endDate:"2026-06-01", tempAccess:false,
+                criticality:"High", backup:"Shared finance team account available through department head",
+                notes:"", createdAt:"2026-03-20 14:15"
+            },
+            "c3d4e5f6-a7b8-9012-cdef-123456789012": {
+                fullName:"Can Ozturk", username:"cozturk", department:"Marketing", jobTitle:"Digital Marketing Specialist",
+                systemName:"Google Analytics", url:"https://analytics.google.com", category:"Other", accountType:"Shared",
+                accessType:"Read", authMethod:"MFA",
+                businessReason:"Monitor website traffic, campaign performance metrics, and user behavior analytics for marketing strategy decisions.",
+                businessProcess:"Digital Marketing Analytics", impact:"Medium",
+                secondaryName:"Selin Celik", secondaryEmail:"scelik@company.com",
+                unavailPlan:"Selin has the same read access. Weekly reports are also auto-emailed to the marketing distribution list.",
+                startDate:"2026-02-01", endDate:"2026-04-15", tempAccess:true,
+                criticality:"Low", backup:"",
+                notes:"Access granted for Q1 campaign tracking. Review for extension in April.", createdAt:"2026-04-01 10:00"
+            },
+            "d4e5f6a7-b8c9-0123-defa-234567890123": {
+                fullName:"Deniz Sahin", username:"dsahin", department:"Human Resources", jobTitle:"HR Coordinator",
+                systemName:"Workday HCM", url:"https://workday.company.com", category:"HR", accountType:"Individual",
+                accessType:"Write", authMethod:"SSO",
+                businessReason:"Manage employee onboarding records, update personnel files, process leave requests, and generate HR compliance reports.",
+                businessProcess:"Employee Lifecycle Management", impact:"High",
+                secondaryName:"", secondaryEmail:"",
+                unavailPlan:"Currently no backup. Requesting cross-training for a second team member.",
+                startDate:"2025-09-01", endDate:null, tempAccess:false,
+                criticality:"High", backup:"HR Director can approve emergency access via IT ticket",
+                notes:"Handles sensitive PII data. Regular access reviews required.", createdAt:"2026-03-25 16:45"
+            },
+            "e5f6a7b8-c9d0-1234-efab-345678901234": {
+                fullName:"Baris Yildiz", username:"byildiz", department:"Engineering", jobTitle:"Backend Developer",
+                systemName:"AWS Console", url:"https://console.aws.amazon.com", category:"Dev Tool", accountType:"Individual",
+                accessType:"Admin", authMethod:"MFA",
+                businessReason:"Deploy and manage production microservices, configure infrastructure, and respond to production incidents as part of on-call rotation.",
+                businessProcess:"Production Infrastructure Management", impact:"Critical",
+                secondaryName:"Kerem Akin", secondaryEmail:"kakin@company.com",
+                unavailPlan:"Kerem Akin is secondary on-call and has equivalent AWS permissions. Runbook is in Confluence under Incident Response.",
+                startDate:"2025-03-01", endDate:"2026-03-01", tempAccess:false,
+                criticality:"Critical", backup:"Root account credentials in physical safe at IT office",
+                notes:"AWS credentials stored in local ~/.aws/credentials for CLI access. MFA enforced for console.", createdAt:"2026-04-05 08:20"
+            }
+        };
+
+        function critBadge(level) {
+            if (!level) return '\u2014';
+            return '<span class="badge badge-' + level.toLowerCase() + '">' + level + '</span>';
+        }
+        function impactBadge(level) {
+            if (level === 'Critical') return '<span class="badge badge-critical">' + level + '</span>';
+            if (level === 'High') return '<span class="badge badge-warn">' + level + '</span>';
+            return level || '\u2014';
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        var id = params.get('id') || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+        var container = document.getElementById('content');
+
+        if (!records[id]) {
+            container.innerHTML = '<h1 style="margin-top:1rem">Record Not Found</h1><p>The requested record does not exist.</p>';
+        } else {
+            var s = records[id];
+            container.innerHTML =
+                '<p class="meta">ID: ' + id + ' &mdash; Created: ' + s.createdAt + '</p>' +
+
+                '<section class="detail-section"><h2>User Information</h2><dl>' +
+                '<dt>Full Name</dt><dd>' + s.fullName + '</dd>' +
+                '<dt>Username</dt><dd>' + s.username + '</dd>' +
+                '<dt>Department</dt><dd>' + s.department + '</dd>' +
+                '<dt>Job Title</dt><dd>' + s.jobTitle + '</dd>' +
+                '</dl></section>' +
+
+                '<section class="detail-section"><h2>System Information</h2><dl>' +
+                '<dt>System Name</dt><dd>' + s.systemName + '</dd>' +
+                '<dt>URL</dt><dd>' + (s.url || '\u2014') + '</dd>' +
+                '<dt>Category</dt><dd>' + s.category + '</dd>' +
+                '<dt>Account Type</dt><dd>' + s.accountType + '</dd>' +
+                '</dl></section>' +
+
+                '<section class="detail-section"><h2>Access Details</h2><dl>' +
+                '<dt>Access Type</dt><dd>' + s.accessType + '</dd>' +
+                '<dt>Authentication</dt><dd>' + s.authMethod + '</dd>' +
+                '</dl></section>' +
+
+                '<section class="detail-section"><h2>Business Context</h2><dl>' +
+                '<dt>Business Reason</dt><dd class="pre-wrap">' + s.businessReason + '</dd>' +
+                '<dt>Business Process</dt><dd class="pre-wrap">' + (s.businessProcess || '\u2014') + '</dd>' +
+                '<dt>Impact if Lost</dt><dd>' + impactBadge(s.impact) + '</dd>' +
+                '</dl></section>' +
+
+                '<section class="detail-section"><h2>Continuity Plan</h2><dl>' +
+                '<dt>Secondary Contact</dt><dd>' + (s.secondaryName || '\u2014') + '</dd>' +
+                '<dt>Contact Email</dt><dd>' + (s.secondaryEmail || '\u2014') + '</dd>' +
+                '<dt>Unavailability Plan</dt><dd class="pre-wrap">' + s.unavailPlan + '</dd>' +
+                '</dl></section>' +
+
+                '<section class="detail-section"><h2>Lifecycle</h2><dl>' +
+                '<dt>Start Date</dt><dd>' + (s.startDate || '\u2014') + '</dd>' +
+                '<dt>End Date</dt><dd>' + (s.endDate || '\u2014') + '</dd>' +
+                '<dt>Temporary Access</dt><dd>' + (s.tempAccess ? 'Yes' : 'No') + '</dd>' +
+                '</dl></section>' +
+
+                '<section class="detail-section"><h2>Additional Information</h2><dl>' +
+                '<dt>Criticality Level</dt><dd>' + critBadge(s.criticality) + '</dd>' +
+                '<dt>Backup Access Method</dt><dd class="pre-wrap">' + (s.backup || '\u2014') + '</dd>' +
+                '<dt>Notes</dt><dd class="pre-wrap">' + (s.notes || '\u2014') + '</dd>' +
+                '</dl></section>' +
+
+                '<div class="form-actions"><a href="dashboard.html" class="btn btn-back">Back to Dashboard</a></div>';
+        }
+    </script>
+</body>
+</html>

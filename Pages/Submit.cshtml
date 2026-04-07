@@ -1,0 +1,227 @@
+@page
+@model SubmitModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Record Submission</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="submit-page">
+    <div class="page-header">
+        <h1>Access Record Submission</h1>
+        <div class="subtitle">Register your system access for tracking and continuity planning</div>
+    </div>
+    <div class="container narrow">
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="success-banner">@Model.SuccessMessage</div>
+        }
+        else
+        {
+            <form method="post">
+                <div asp-validation-summary="All" class="validation-errors"></div>
+
+                <!-- USER INFO -->
+                <fieldset>
+                    <legend>User Information</legend>
+                    <div class="form-group">
+                        <label asp-for="Submission.FullName">Full Name <span class="req">*</span></label>
+                        <input asp-for="Submission.FullName" required />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.Username">Username <span class="req">*</span></label>
+                        <input asp-for="Submission.Username" required />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.Department">Department</label>
+                        <select asp-for="Submission.Department">
+                            <option value="">-- Select --</option>
+                            <option>Accounting</option>
+                            <option>Administration</option>
+                            <option>Business Development</option>
+                            <option>Customer Service</option>
+                            <option>Engineering</option>
+                            <option>Finance</option>
+                            <option>Human Resources</option>
+                            <option>IT</option>
+                            <option>Legal</option>
+                            <option>Marketing</option>
+                            <option>Operations</option>
+                            <option>Procurement</option>
+                            <option>Quality Assurance</option>
+                            <option>Sales</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.JobTitle">Job Title</label>
+                        <input asp-for="Submission.JobTitle" />
+                    </div>
+                </fieldset>
+
+                <!-- SYSTEM INFO -->
+                <fieldset>
+                    <legend>System Information</legend>
+                    <div class="form-group">
+                        <label asp-for="Submission.SystemName">System Name <span class="req">*</span></label>
+                        <input asp-for="Submission.SystemName" required />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.Url">URL</label>
+                        <input asp-for="Submission.Url" type="url" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.Category">Category</label>
+                        <select asp-for="Submission.Category">
+                            <option value="">-- Select --</option>
+                            <option>Finance</option>
+                            <option>HR</option>
+                            <option>E-Signature</option>
+                            <option>CRM</option>
+                            <option>Dev Tool</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.AccountType">Account Type</label>
+                        <select asp-for="Submission.AccountType">
+                            <option value="">-- Select --</option>
+                            <option>Individual</option>
+                            <option>Shared</option>
+                            <option>Service</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <!-- ACCESS DETAILS -->
+                <fieldset>
+                    <legend>Access Details</legend>
+                    <div class="form-group">
+                        <label asp-for="Submission.AccessType">Access Type</label>
+                        <select asp-for="Submission.AccessType" id="accessTypeSelect">
+                            <option value="">-- Select --</option>
+                            <option>Read</option>
+                            <option>Write</option>
+                            <option>Admin</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="accessTypeOtherGroup" style="display:none;">
+                        <label asp-for="Submission.AccessTypeOther">Specify Access Type</label>
+                        <input asp-for="Submission.AccessTypeOther" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.AuthenticationMethod">Authentication Method</label>
+                        <select asp-for="Submission.AuthenticationMethod">
+                            <option value="">-- Select --</option>
+                            <option>Username/Password</option>
+                            <option>SSO</option>
+                            <option>MFA</option>
+                            <option>API Key</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <!-- BUSINESS CONTEXT -->
+                <fieldset>
+                    <legend>Business Context</legend>
+                    <div class="form-group">
+                        <label asp-for="Submission.BusinessReason">Business Reason <span class="req">*</span></label>
+                        <textarea asp-for="Submission.BusinessReason" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.BusinessProcess">Business Process</label>
+                        <textarea asp-for="Submission.BusinessProcess" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.ImpactIfLost">Impact if Lost</label>
+                        <select asp-for="Submission.ImpactIfLost">
+                            <option value="">-- Select --</option>
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High</option>
+                            <option>Critical</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <!-- CONTINUITY -->
+                <fieldset>
+                    <legend>Continuity Plan</legend>
+                    <div class="form-group">
+                        <label asp-for="Submission.SecondaryContactName">Secondary Contact Name <span class="req">*</span></label>
+                        <input asp-for="Submission.SecondaryContactName" required />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.SecondaryContactEmail">Secondary Contact Email</label>
+                        <input asp-for="Submission.SecondaryContactEmail" type="email" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.UnavailabilityPlan">What should be done if user is unavailable <span class="req">*</span></label>
+                        <textarea asp-for="Submission.UnavailabilityPlan" rows="4" required></textarea>
+                    </div>
+                </fieldset>
+
+                <!-- LIFECYCLE -->
+                <fieldset>
+                    <legend>Lifecycle</legend>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label asp-for="Submission.StartDate">Start Date</label>
+                            <input asp-for="Submission.StartDate" type="date" />
+                        </div>
+                        <div class="form-group half">
+                            <label asp-for="Submission.EndDate">End Date</label>
+                            <input asp-for="Submission.EndDate" type="date" />
+                        </div>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input asp-for="Submission.TemporaryAccess" type="checkbox" />
+                            Temporary Access
+                        </label>
+                    </div>
+                </fieldset>
+
+                <!-- EXTRA -->
+                <fieldset>
+                    <legend>Additional Information</legend>
+                    <div class="form-group">
+                        <label asp-for="Submission.CriticalityLevel">System Criticality Level</label>
+                        <select asp-for="Submission.CriticalityLevel">
+                            <option value="">-- Select --</option>
+                            <option value="Low">Low - Minimal business impact</option>
+                            <option value="Medium">Medium - Noticeable disruption</option>
+                            <option value="High">High - Significant operational impact</option>
+                            <option value="Critical">Critical - Business cannot function</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.BackupAccessMethod">Backup Access Method</label>
+                        <textarea asp-for="Submission.BackupAccessMethod" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Submission.Notes">Notes</label>
+                        <textarea asp-for="Submission.Notes" rows="3"></textarea>
+                    </div>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit">Submit Access Record</button>
+                </div>
+            </form>
+        }
+    </div>
+
+    <script>
+        document.getElementById('accessTypeSelect').addEventListener('change', function () {
+            document.getElementById('accessTypeOtherGroup').style.display =
+                this.value === 'Other' ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

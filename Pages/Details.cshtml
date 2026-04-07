@@ -1,0 +1,142 @@
+@page
+@model DetailsModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Record Details</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="details-page">
+    <div class="page-header">
+        <h1>Access Record Details</h1>
+        <div class="subtitle">Full view of a submitted access record</div>
+    </div>
+    <div class="container narrow">
+        @if (Model.Submission == null)
+        {
+            <h1>Record Not Found</h1>
+            <p>The requested record does not exist.</p>
+        }
+        else
+        {
+            var s = Model.Submission;
+
+            <p class="meta">ID: @s.Id &mdash; Created: @s.CreatedAt.ToString("yyyy-MM-dd HH:mm")</p>
+
+            <!-- User Info -->
+            <section class="detail-section">
+                <h2>User Information</h2>
+                <dl>
+                    <dt>Full Name</dt><dd>@s.FullName</dd>
+                    <dt>Username</dt><dd>@s.Username</dd>
+                    <dt>Department</dt><dd>@s.Department</dd>
+                    <dt>Job Title</dt><dd>@s.JobTitle</dd>
+                </dl>
+            </section>
+
+            <!-- System Info -->
+            <section class="detail-section">
+                <h2>System Information</h2>
+                <dl>
+                    <dt>System Name</dt><dd>@s.SystemName</dd>
+                    <dt>URL</dt><dd>@(string.IsNullOrEmpty(s.Url) ? "—" : s.Url)</dd>
+                    <dt>Category</dt><dd>@s.Category</dd>
+                    <dt>Account Type</dt><dd>@s.AccountType</dd>
+                </dl>
+            </section>
+
+            <!-- Access Details -->
+            <section class="detail-section">
+                <h2>Access Details</h2>
+                <dl>
+                    <dt>Access Type</dt><dd>@(s.AccessType == "Other" ? s.AccessTypeOther : s.AccessType)</dd>
+                    <dt>Authentication</dt><dd>@s.AuthenticationMethod</dd>
+                </dl>
+            </section>
+
+            <!-- Business Context -->
+            <section class="detail-section">
+                <h2>Business Context</h2>
+                <dl>
+                    <dt>Business Reason</dt><dd class="pre-wrap">@s.BusinessReason</dd>
+                    <dt>Business Process</dt><dd class="pre-wrap">@(string.IsNullOrEmpty(s.BusinessProcess) ? "—" : s.BusinessProcess)</dd>
+                    <dt>Impact if Lost</dt>
+                    <dd>
+                        @if (s.ImpactIfLost == "Critical")
+                        {
+                            <span class="badge badge-critical">@s.ImpactIfLost</span>
+                        }
+                        else if (s.ImpactIfLost == "High")
+                        {
+                            <span class="badge badge-warn">@s.ImpactIfLost</span>
+                        }
+                        else
+                        {
+                            @s.ImpactIfLost
+                        }
+                    </dd>
+                </dl>
+            </section>
+
+            <!-- Continuity Plan -->
+            <section class="detail-section">
+                <h2>Continuity Plan</h2>
+                <dl>
+                    <dt>Secondary Contact</dt><dd>@s.SecondaryContactName</dd>
+                    <dt>Contact Email</dt><dd>@(string.IsNullOrEmpty(s.SecondaryContactEmail) ? "—" : s.SecondaryContactEmail)</dd>
+                    <dt>Unavailability Plan</dt><dd class="pre-wrap">@s.UnavailabilityPlan</dd>
+                </dl>
+            </section>
+
+            <!-- Lifecycle -->
+            <section class="detail-section">
+                <h2>Lifecycle</h2>
+                <dl>
+                    <dt>Start Date</dt><dd>@(s.StartDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
+                    <dt>End Date</dt><dd>@(s.EndDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
+                    <dt>Temporary Access</dt><dd>@(s.TemporaryAccess ? "Yes" : "No")</dd>
+                </dl>
+            </section>
+
+            <!-- Notes -->
+            <section class="detail-section">
+                <h2>Additional Information</h2>
+                <dl>
+                    <dt>Criticality Level</dt>
+                    <dd>
+                        @if (s.CriticalityLevel == "Critical")
+                        {
+                            <span class="badge badge-critical">@s.CriticalityLevel</span>
+                        }
+                        else if (s.CriticalityLevel == "High")
+                        {
+                            <span class="badge badge-high">@s.CriticalityLevel</span>
+                        }
+                        else if (s.CriticalityLevel == "Medium")
+                        {
+                            <span class="badge badge-medium">@s.CriticalityLevel</span>
+                        }
+                        else if (!string.IsNullOrEmpty(s.CriticalityLevel))
+                        {
+                            <span class="badge badge-low">@s.CriticalityLevel</span>
+                        }
+                        else
+                        {
+                            <span>—</span>
+                        }
+                    </dd>
+                    <dt>Backup Access Method</dt><dd class="pre-wrap">@(string.IsNullOrEmpty(s.BackupAccessMethod) ? "—" : s.BackupAccessMethod)</dd>
+                    <dt>Notes</dt><dd class="pre-wrap">@(string.IsNullOrEmpty(s.Notes) ? "—" : s.Notes)</dd>
+                </dl>
+            </section>
+
+            <div class="form-actions">
+                <a href="/Dashboard" class="btn btn-back">Back to Dashboard</a>
+            </div>
+        }
+    </div>
+</body>
+</html>

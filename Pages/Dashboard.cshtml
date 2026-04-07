@@ -1,0 +1,144 @@
+@page
+@model DashboardModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Records Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="dashboard-page">
+    <div class="page-header">
+        <h1>Access Records Dashboard</h1>
+        <div class="subtitle">System access overview for HR / IT administration</div>
+    </div>
+    <div class="container wide">
+
+        <!-- FILTERS -->
+        <form method="get" class="filters">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label for="dept">Department</label>
+                    <select name="department" id="dept">
+                        <option value="">All Departments</option>
+                        <option value="Accounting" selected="@(Model.Department == "Accounting" ? "selected" : null)">Accounting</option>
+                        <option value="Administration" selected="@(Model.Department == "Administration" ? "selected" : null)">Administration</option>
+                        <option value="Business Development" selected="@(Model.Department == "Business Development" ? "selected" : null)">Business Development</option>
+                        <option value="Customer Service" selected="@(Model.Department == "Customer Service" ? "selected" : null)">Customer Service</option>
+                        <option value="Engineering" selected="@(Model.Department == "Engineering" ? "selected" : null)">Engineering</option>
+                        <option value="Finance" selected="@(Model.Department == "Finance" ? "selected" : null)">Finance</option>
+                        <option value="Human Resources" selected="@(Model.Department == "Human Resources" ? "selected" : null)">Human Resources</option>
+                        <option value="IT" selected="@(Model.Department == "IT" ? "selected" : null)">IT</option>
+                        <option value="Legal" selected="@(Model.Department == "Legal" ? "selected" : null)">Legal</option>
+                        <option value="Marketing" selected="@(Model.Department == "Marketing" ? "selected" : null)">Marketing</option>
+                        <option value="Operations" selected="@(Model.Department == "Operations" ? "selected" : null)">Operations</option>
+                        <option value="Procurement" selected="@(Model.Department == "Procurement" ? "selected" : null)">Procurement</option>
+                        <option value="Quality Assurance" selected="@(Model.Department == "Quality Assurance" ? "selected" : null)">Quality Assurance</option>
+                        <option value="Sales" selected="@(Model.Department == "Sales" ? "selected" : null)">Sales</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="sys">System Name</label>
+                    <input type="text" name="system" id="sys" value="@Model.SystemSearch" placeholder="Search..." />
+                </div>
+                <div class="filter-item">
+                    <label for="crit">Criticality</label>
+                    <select name="criticality" id="crit">
+                        <option value="">All Levels</option>
+                        <option value="Critical" selected="@(Model.Criticality == "Critical" ? "selected" : null)">Critical</option>
+                        <option value="High" selected="@(Model.Criticality == "High" ? "selected" : null)">High</option>
+                        <option value="Medium" selected="@(Model.Criticality == "Medium" ? "selected" : null)">Medium</option>
+                        <option value="Low" selected="@(Model.Criticality == "Low" ? "selected" : null)">Low</option>
+                    </select>
+                </div>
+                <div class="filter-item checkbox-filter">
+                    <label><input type="checkbox" name="expired" value="true" checked="@(Model.ShowExpired ? "checked" : null)" /> Show expired</label>
+                </div>
+                <div class="filter-item">
+                    <button type="submit">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <p class="record-count">Showing @Model.Filtered.Count record(s)</p>
+
+        @if (Model.Filtered.Count == 0)
+        {
+            <p class="empty">No records found.</p>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Department</th>
+                            <th>System</th>
+                            <th>Access</th>
+                            <th>Business Reason</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Secondary Contact</th>
+                            <th>Criticality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Filtered)
+                        {
+                            var rowClass = "";
+                            if (s.EndDate.HasValue && s.EndDate.Value < DateTime.Today)
+                                rowClass = "row-expired";
+                            else if (s.EndDate.HasValue && s.EndDate.Value < DateTime.Today.AddDays(30))
+                                rowClass = "row-expiring";
+
+                            if (string.IsNullOrWhiteSpace(s.SecondaryContactName))
+                                rowClass += " row-no-contact";
+
+                            <tr class="@rowClass clickable" onclick="window.location='/Details?id=@s.Id'">
+                                <td>@s.FullName</td>
+                                <td>@s.Department</td>
+                                <td>@s.SystemName</td>
+                                <td>@s.AccessType</td>
+                                <td class="truncate">@(s.BusinessReason.Length > 60 ? s.BusinessReason[..60] + "..." : s.BusinessReason)</td>
+                                <td>@s.StartDate?.ToString("yyyy-MM-dd")</td>
+                                <td>@s.EndDate?.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(s.SecondaryContactName))
+                                    {
+                                        <span class="badge badge-warn">Missing</span>
+                                    }
+                                    else
+                                    {
+                                        @s.SecondaryContactName
+                                    }
+                                </td>
+                                <td>
+                                    @if (s.CriticalityLevel == "Critical")
+                                    {
+                                        <span class="badge badge-critical">@s.CriticalityLevel</span>
+                                    }
+                                    else if (s.CriticalityLevel == "High")
+                                    {
+                                        <span class="badge badge-high">@s.CriticalityLevel</span>
+                                    }
+                                    else if (s.CriticalityLevel == "Medium")
+                                    {
+                                        <span class="badge badge-medium">@s.CriticalityLevel</span>
+                                    }
+                                    else if (!string.IsNullOrEmpty(s.CriticalityLevel))
+                                    {
+                                        <span class="badge badge-low">@s.CriticalityLevel</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</body>
+</html>

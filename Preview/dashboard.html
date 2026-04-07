@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Records Dashboard</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
+            --primary-glow: rgba(218,33,40,0.12);
+            --bg: #f0f2f5; --surface: #ffffff; --text: #1c1c2e; --text-secondary: #4a5568;
+            --text-muted: #8892a4; --border: #e2e5ec; --border-light: #eef1f6;
+            --danger-row: #fff5f5; --danger-row-hover: #fee2e2;
+            --expiring-row: #fffbeb; --expiring-row-hover: #fef3c7;
+            --warn-bg: #fffbeb; --warn-text: #92400e; --warn-border: #fbbf24;
+            --radius: 8px; --radius-lg: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+        }
+        html { font-size: 16px; }
+        body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; padding: 1.75rem 2rem;
+            box-shadow: 0 2px 12px rgba(218,33,40,0.2);
+        }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+        .page-header .subtitle { font-size: 0.88rem; opacity: 0.85; margin-top: 0.25rem; }
+
+        .container { margin: 0 auto; padding: 1.75rem 1.5rem; max-width: 1260px; }
+
+        .filters {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 1.15rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow);
+        }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+        .filter-item { display: flex; flex-direction: column; gap: 0.3rem; }
+        .filter-item label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .filter-item input[type="text"], .filter-item select {
+            padding: 0.5rem 0.7rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+            font-size: 0.9rem; font-family: inherit; background: #fafbfc; transition: border-color 0.2s;
+        }
+        .filter-item input:focus, .filter-item select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .checkbox-filter label { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; padding-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); }
+        .checkbox-filter input[type="checkbox"] { accent-color: var(--primary); }
+        .filter-item button {
+            padding: 0.5rem 1.5rem; background: var(--primary); color: #fff; border: none; border-radius: var(--radius);
+            cursor: pointer; font-size: 0.88rem; font-weight: 700; transition: all 0.2s; letter-spacing: 0.02em;
+        }
+        .filter-item button:hover { background: var(--primary-dark); box-shadow: 0 2px 8px rgba(218,33,40,0.2); }
+
+        .record-count { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
+
+        .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+        table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.9rem; }
+        thead { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+        th { text-align: left; padding: 0.8rem 0.85rem; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; }
+        td { padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+        tr.clickable { cursor: pointer; transition: background 0.15s; }
+        tr.clickable:hover { background: var(--primary-light); }
+        .truncate { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        tr.row-expired { background: var(--danger-row) !important; }
+        tr.row-expired:hover { background: var(--danger-row-hover) !important; }
+        tr.row-expiring { background: var(--expiring-row) !important; }
+        tr.row-expiring:hover { background: var(--expiring-row-hover) !important; }
+        tr.row-no-contact td:nth-child(8) { color: var(--primary); font-weight: 700; }
+
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
+        .badge-critical { background: var(--primary); color: #fff; }
+        .badge-high { background: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+        .badge-medium { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+        .badge-low { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+        .badge-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+
+        .empty { text-align: center; color: var(--text-muted); padding: 3rem; font-size: 1.1rem; }
+        @media (max-width: 768px) { .filter-row { flex-direction: column; } .truncate { max-width: 120px; } table { font-size: 0.82rem; } th, td { padding: 0.5rem; } .page-header { padding: 1.25rem 1rem; } .page-header h1 { font-size: 1.25rem; } }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>Access Records Dashboard</h1>
+        <div class="subtitle">System access overview for HR / IT administration</div>
+    </div>
+
+    <div class="container">
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>Department</label>
+                    <select id="deptFilter">
+                        <option value="">All Departments</option>
+                        <option>Accounting</option><option>Administration</option><option>Business Development</option>
+                        <option>Customer Service</option><option>Engineering</option><option>Finance</option>
+                        <option>Human Resources</option><option>IT</option><option>Legal</option>
+                        <option>Marketing</option><option>Operations</option><option>Procurement</option>
+                        <option>Quality Assurance</option><option>Sales</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>System Name</label>
+                    <input type="text" id="sysFilter" placeholder="Search..." />
+                </div>
+                <div class="filter-item">
+                    <label>Criticality</label>
+                    <select id="critFilter">
+                        <option value="">All Levels</option>
+                        <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+                    </select>
+                </div>
+                <div class="filter-item checkbox-filter">
+                    <label><input type="checkbox" id="expFilter" /> Show expired</label>
+                </div>
+                <div class="filter-item">
+                    <button onclick="applyFilters()">Filter</button>
+                </div>
+            </div>
+        </div>
+
+        <p class="record-count" id="recordCount">Showing 5 record(s)</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Full Name</th><th>Department</th><th>System</th><th>Access</th>
+                        <th>Business Reason</th><th>Start</th><th>End</th><th>Secondary Contact</th><th>Criticality</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var data = [
+            { id:"a1b2c3d4-e5f6-7890-abcd-ef1234567890", fullName:"Ahmet Yilmaz", department:"IT", system:"Azure DevOps", access:"Admin", reason:"Manage CI/CD pipelines, code repositories, and project boards for all engineering teams. Required for daily operations and release management.", start:"2025-01-10", end:null, contact:"Mehmet Demir", criticality:"Critical" },
+            { id:"b2c3d4e5-f6a7-8901-bcde-f12345678901", fullName:"Elif Kaya", department:"Finance", system:"SAP ERP", access:"Write", reason:"Process monthly financial reports, manage accounts payable and receivable, and prepare quarterly audit documentation.", start:"2025-06-01", end:"2026-06-01", contact:"Zeynep Arslan", criticality:"High" },
+            { id:"c3d4e5f6-a7b8-9012-cdef-123456789012", fullName:"Can Ozturk", department:"Marketing", system:"Google Analytics", access:"Read", reason:"Monitor website traffic, campaign performance metrics, and user behavior analytics for marketing strategy decisions.", start:"2026-02-01", end:"2026-04-15", contact:"Selin Celik", criticality:"Low" },
+            { id:"d4e5f6a7-b8c9-0123-defa-234567890123", fullName:"Deniz Sahin", department:"Human Resources", system:"Workday HCM", access:"Write", reason:"Manage employee onboarding records, update personnel files, process leave requests, and generate HR compliance reports.", start:"2025-09-01", end:null, contact:"", criticality:"High" },
+            { id:"e5f6a7b8-c9d0-1234-efab-345678901234", fullName:"Baris Yildiz", department:"Engineering", system:"AWS Console", access:"Admin", reason:"Deploy and manage production microservices, configure infrastructure, and respond to production incidents as part of on-call rotation.", start:"2025-03-01", end:"2026-03-01", contact:"Kerem Akin", criticality:"Critical" }
+        ];
+
+        var today = new Date(); today.setHours(0,0,0,0);
+        var in30 = new Date(today); in30.setDate(in30.getDate() + 30);
+
+        function getRowClass(item) {
+            var cls = [];
+            if (item.end) { var ed = new Date(item.end); if (ed < today) cls.push('row-expired'); else if (ed < in30) cls.push('row-expiring'); }
+            if (!item.contact) cls.push('row-no-contact');
+            return cls.join(' ');
+        }
+        function truncate(s, n) { return s.length > n ? s.substring(0, n) + '...' : s; }
+        function critBadge(level) {
+            if (!level) return '';
+            var cls = 'badge-' + level.toLowerCase();
+            return '<span class="badge ' + cls + '">' + level + '</span>';
+        }
+
+        function renderTable(items) {
+            var tb = document.getElementById('tableBody');
+            tb.innerHTML = '';
+            items.forEach(function(r) {
+                var tr = document.createElement('tr');
+                tr.className = getRowClass(r) + ' clickable';
+                tr.onclick = function() { window.location = 'details.html?id=' + r.id; };
+                tr.innerHTML =
+                    '<td>' + r.fullName + '</td>' +
+                    '<td>' + r.department + '</td>' +
+                    '<td>' + r.system + '</td>' +
+                    '<td>' + r.access + '</td>' +
+                    '<td class="truncate">' + truncate(r.reason, 60) + '</td>' +
+                    '<td>' + (r.start || '') + '</td>' +
+                    '<td>' + (r.end || '') + '</td>' +
+                    '<td>' + (r.contact ? r.contact : '<span class="badge badge-warn">Missing</span>') + '</td>' +
+                    '<td>' + critBadge(r.criticality) + '</td>';
+                tb.appendChild(tr);
+            });
+            document.getElementById('recordCount').textContent = 'Showing ' + items.length + ' record(s)';
+        }
+
+        function applyFilters() {
+            var dept = document.getElementById('deptFilter').value;
+            var sys = document.getElementById('sysFilter').value.toLowerCase();
+            var crit = document.getElementById('critFilter').value;
+            var exp = document.getElementById('expFilter').checked;
+            var filtered = data.filter(function(r) {
+                if (dept && r.department !== dept) return false;
+                if (sys && r.system.toLowerCase().indexOf(sys) === -1) return false;
+                if (crit && r.criticality !== crit) return false;
+                if (!exp && r.end) { var ed = new Date(r.end); if (ed < today) return false; }
+                return true;
+            });
+            renderTable(filtered);
+        }
+
+        applyFilters();
+    </script>
+</body>
+</html>

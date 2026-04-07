@@ -1,0 +1,21 @@
+{
+  "profiles": {
+    "AccessTracker": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "Submit",
+      "applicationUrl": "http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "Submit",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
