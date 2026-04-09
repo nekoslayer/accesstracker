@@ -1,0 +1,28 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.userprefs
+
+## App data (runtime-generated, do not commit)
+App_Data/accounts.json
+
+## Keep sample submissions for demo
+# App_Data/submissions.json
+
+## Preview files (optional — comment out to include)
+# Preview/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Rider / JetBrains
+.idea/
+
+## Logs
+*.log
+logs/

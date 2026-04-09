@@ -6,19 +6,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Record Details</title>
+    <title>Record Details — AccessTracker</title>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body class="details-page">
     <div class="page-header">
-        <h1>Access Record Details</h1>
-        <div class="subtitle">Full view of a submitted access record</div>
+        <div class="header-left">
+            <h1>Access Record Details</h1>
+            <div class="subtitle">Full view of a submitted access record</div>
+        </div>
+        <div class="header-right">
+            <a href="/Dashboard" class="header-link">Dashboard</a>
+            <form method="post" asp-page-handler="Logout" style="display:inline;">
+                <button type="submit" class="header-logout">Sign Out</button>
+            </form>
+        </div>
     </div>
     <div class="container narrow">
         @if (Model.Submission == null)
         {
-            <h1>Record Not Found</h1>
-            <p>The requested record does not exist.</p>
+            <p class="empty">Record not found.</p>
+            <div class="form-actions"><a href="/Dashboard" class="btn btn-back">Back to Dashboard</a></div>
         }
         else
         {
@@ -101,7 +109,7 @@
                 </dl>
             </section>
 
-            <!-- Notes -->
+            <!-- Additional Info -->
             <section class="detail-section">
                 <h2>Additional Information</h2>
                 <dl>
@@ -134,6 +142,7 @@
             </section>
 
             <div class="form-actions">
+                <a href="/Edit?id=@s.Id" class="btn">Edit Record</a>
                 <a href="/Dashboard" class="btn btn-back">Back to Dashboard</a>
             </div>
         }

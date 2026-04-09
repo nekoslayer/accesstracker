@@ -1,0 +1,105 @@
+@page
+@model AdminsModel
+@using AccessTracker.Models
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Accounts — AccessTracker</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="dashboard-page">
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Admin Accounts</h1>
+            <div class="subtitle">Manage who can access the dashboard</div>
+        </div>
+        <div class="header-right">
+            <a href="/Dashboard" class="header-link">Dashboard</a>
+            <form method="post" asp-page-handler="Logout" style="display:inline;">
+                <button type="submit" class="header-logout">Sign Out</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container narrow">
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="@(Model.IsError ? "validation-errors" : "success-banner")">@Model.Message</div>
+        }
+
+        <!-- Add new admin -->
+        <div class="detail-section" style="margin-bottom: 2rem;">
+            <h2>Add New Admin</h2>
+            <form method="post" asp-page-handler="Add" class="add-admin-form">
+                <div class="add-admin-row">
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                        <label for="newUsername">Username</label>
+                        <input type="text" id="newUsername" name="NewUsername" required
+                               placeholder="e.g. john.doe" autocomplete="off" />
+                    </div>
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                        <label for="newPassword">Password</label>
+                        <input type="password" id="newPassword" name="NewPassword" required
+                               placeholder="Min. 6 characters" autocomplete="new-password" />
+                    </div>
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="ConfirmPassword" required
+                               placeholder="Repeat password" autocomplete="new-password" />
+                    </div>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button type="submit" class="btn" style="white-space:nowrap;">Add Admin</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Existing admins -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Created</th>
+                        <th style="width:90px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.Accounts)
+                    {
+                        <tr>
+                            <td>
+                                @a.Username
+                                @if (a.Username.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge badge-critical" style="margin-left:0.5rem; font-size:0.65rem;">DEFAULT</span>
+                                }
+                            </td>
+                            <td>@a.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                @if (Model.Accounts.Count > 1)
+                                {
+                                    <form method="post" asp-page-handler="Delete"
+                                          onsubmit="return confirm('Delete @a.Username?')">
+                                        <input type="hidden" name="DeleteId" value="@a.Id" />
+                                        <button type="submit" class="btn-danger">Delete</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="font-size:0.78rem; color:var(--text-muted);">Last admin</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>
+</html>

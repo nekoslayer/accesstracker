@@ -46,4 +46,20 @@ public class JsonStorageService
             File.WriteAllText(_filePath, json);
         }
     }
+
+    public bool Update(Submission updated)
+    {
+        lock (_lock)
+        {
+            var list = GetAll();
+            var idx = list.FindIndex(s => s.Id == updated.Id);
+            if (idx < 0)
+                return false;
+
+            updated.CreatedAt = list[idx].CreatedAt; // preserve original submission time
+            list[idx] = updated;
+            File.WriteAllText(_filePath, JsonSerializer.Serialize(list, _options));
+            return true;
+        }
+    }
 }

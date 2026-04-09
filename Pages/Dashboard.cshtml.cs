@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using AccessTracker.Models;
@@ -5,6 +8,7 @@ using AccessTracker.Services;
 
 namespace AccessTracker.Pages;
 
+[Authorize]
 public class DashboardModel : PageModel
 {
     private readonly JsonStorageService _storage;
@@ -38,5 +42,11 @@ public class DashboardModel : PageModel
             all = all.Where(s => !s.EndDate.HasValue || s.EndDate.Value >= DateTime.Today).ToList();
 
         Filtered = all.OrderByDescending(s => s.CreatedAt).ToList();
+    }
+
+    public async Task<IActionResult> OnPostLogoutAsync()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToPage("/Login");
     }
 }

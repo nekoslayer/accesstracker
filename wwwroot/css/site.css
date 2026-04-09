@@ -9,7 +9,6 @@
 
     --bg: #f0f2f5;
     --surface: #ffffff;
-    --surface-raised: #ffffff;
     --text: #1c1c2e;
     --text-secondary: #4a5568;
     --text-muted: #8892a4;
@@ -53,72 +52,139 @@ body {
 .page-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: #fff;
-    padding: 1.75rem 2rem;
+    padding: 1.25rem 2rem;
     box-shadow: 0 2px 12px rgba(218, 33, 40, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
+.header-left { flex: 1; min-width: 0; }
+
 .page-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     margin: 0;
     color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .page-header .subtitle {
-    font-size: 0.88rem;
-    opacity: 0.85;
-    margin-top: 0.25rem;
+    font-size: 0.82rem;
+    opacity: 0.8;
+    margin-top: 0.15rem;
     font-weight: 400;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.header-link {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.header-link:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.7);
+    color: #fff;
+}
+
+.header-logout {
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.header-logout:hover {
+    background: rgba(0,0,0,0.35);
+    border-color: rgba(255,255,255,0.6);
 }
 
 /* ===== LAYOUT ===== */
 .container { margin: 0 auto; padding: 2rem 1.5rem; }
 .container.narrow { max-width: 760px; }
-.container.wide { max-width: 1260px; }
+.container.wide { max-width: 1320px; }
 
-h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: var(--text);
-    letter-spacing: -0.02em;
-}
-
-/* ===== SUBMIT PAGE ===== */
-.submit-page { background: var(--bg); }
-.submit-page .container { padding-top: 2rem; }
-
+/* ===== FIELDSET / FORM SECTIONS ===== */
 fieldset {
     border: none;
     border-radius: var(--radius-lg);
-    padding: 1.5rem 1.75rem;
+    padding: 0;
     margin-bottom: 1.25rem;
     background: var(--surface);
     box-shadow: var(--shadow);
+    overflow: hidden;
     position: relative;
 }
 
+/* Red accent stripe at top */
 fieldset::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    display: block;
     height: 3px;
     background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 legend {
-    font-size: 1rem;
+    display: block;
+    width: 100%;
+    padding: 0.85rem 1.75rem 0;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 0;
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-size: 0.82rem;
-    margin-bottom: 0.25rem;
+    letter-spacing: 0.06em;
+    /* legend must be inside the padding flow, not floating at the border */
+    float: left;
+}
+
+/* Fieldset inner content (after legend) */
+fieldset > .form-group,
+fieldset > .form-row,
+fieldset > .checkbox-group {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+}
+
+fieldset > .form-group:first-of-type,
+fieldset > .form-row:first-of-type {
+    padding-top: 0.85rem;
+}
+
+fieldset > .form-group:last-child,
+fieldset > .form-row:last-child,
+fieldset > .checkbox-group:last-child {
+    padding-bottom: 1.5rem;
+}
+
+/* Clearfix after legend float */
+fieldset::after {
+    content: '';
+    display: table;
+    clear: both;
 }
 
 .form-group {
@@ -129,7 +195,7 @@ legend {
     display: block;
     font-weight: 600;
     margin-bottom: 0.4rem;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--text);
     letter-spacing: 0.01em;
 }
@@ -179,12 +245,15 @@ legend {
     accent-color: var(--primary);
 }
 
-.form-row { display: flex; gap: 1rem; }
-.form-group.half { flex: 1; }
+.form-row { display: flex; gap: 1rem; padding-left: 1.75rem; padding-right: 1.75rem; }
+.form-group.half { flex: 1; padding-left: 0 !important; padding-right: 0 !important; }
 
 .form-actions {
     margin-top: 2rem;
-    text-align: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .form-actions button,
@@ -226,15 +295,33 @@ legend {
     box-shadow: 0 4px 16px rgba(71, 85, 105, 0.3);
 }
 
+.btn-danger {
+    background: none;
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    border-radius: var(--radius);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
 .success-banner {
     background: var(--success-bg);
     border-left: 4px solid var(--success-border);
     color: var(--success-text);
-    padding: 1.5rem 1.75rem;
+    padding: 1.25rem 1.5rem;
     border-radius: var(--radius);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
 }
 
 .validation-errors {
@@ -247,6 +334,17 @@ legend {
     font-size: 0.9rem;
     font-weight: 500;
 }
+
+/* ===== ADD ADMIN FORM ROW ===== */
+.add-admin-form { margin-top: 0.5rem; }
+.add-admin-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.add-admin-row .form-group { margin-bottom: 0; }
+.add-admin-row .btn { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
 
 /* ===== DASHBOARD PAGE ===== */
 .dashboard-page { background: var(--bg); }
@@ -269,7 +367,7 @@ legend {
 }
 
 .filter-item { display: flex; flex-direction: column; gap: 0.3rem; }
-.filter-item label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.filter-item label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
 .filter-item input[type="text"],
 .filter-item select {
@@ -300,9 +398,7 @@ legend {
     color: var(--text-secondary);
 }
 
-.checkbox-filter input[type="checkbox"] {
-    accent-color: var(--primary);
-}
+.checkbox-filter input[type="checkbox"] { accent-color: var(--primary); }
 
 .filter-item button {
     padding: 0.5rem 1.5rem;
@@ -314,7 +410,6 @@ legend {
     font-size: 0.88rem;
     font-weight: 700;
     transition: all 0.2s;
-    letter-spacing: 0.02em;
 }
 
 .filter-item button:hover {
@@ -346,7 +441,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: var(--surface);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
 }
 
 thead {
@@ -355,26 +450,27 @@ thead {
 
 th {
     text-align: left;
-    padding: 0.8rem 0.85rem;
+    padding: 0.75rem 0.85rem;
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #fff;
     border-bottom: none;
+    white-space: nowrap;
 }
 
 td {
-    padding: 0.7rem 0.85rem;
+    padding: 0.65rem 0.85rem;
     border-bottom: 1px solid var(--border-light);
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 tr.clickable { cursor: pointer; transition: background 0.15s; }
 tr.clickable:hover { background: var(--primary-light); }
 
 .truncate {
-    max-width: 200px;
+    max-width: 180px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -383,11 +479,45 @@ tr.clickable:hover { background: var(--primary-light); }
 /* Row states */
 tr.row-expired { background: var(--danger-row) !important; }
 tr.row-expired:hover { background: var(--danger-row-hover) !important; }
-
 tr.row-expiring { background: var(--expiring-row) !important; }
 tr.row-expiring:hover { background: var(--expiring-row-hover) !important; }
-
 tr.row-no-contact td:nth-child(8) { color: var(--primary); font-weight: 700; }
+
+/* Action buttons in table */
+.actions-cell { white-space: nowrap; }
+
+.btn-action {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+}
+
+.btn-edit {
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid rgba(218,33,40,0.2);
+    margin-right: 0.3rem;
+}
+.btn-edit:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.btn-view {
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+.btn-view:hover {
+    background: var(--text-secondary);
+    color: #fff;
+}
 
 /* Badges */
 .badge {
@@ -400,34 +530,11 @@ tr.row-no-contact td:nth-child(8) { color: var(--primary); font-weight: 700; }
     text-transform: uppercase;
 }
 
-.badge-critical {
-    background: var(--critical-bg);
-    color: var(--critical-text);
-}
-
-.badge-warn {
-    background: var(--warn-bg);
-    color: var(--warn-text);
-    border: 1px solid var(--warn-border);
-}
-
-.badge-high {
-    background: #fff1f2;
-    color: #be123c;
-    border: 1px solid #fda4af;
-}
-
-.badge-medium {
-    background: #fff7ed;
-    color: #c2410c;
-    border: 1px solid #fdba74;
-}
-
-.badge-low {
-    background: #f0fdf4;
-    color: #15803d;
-    border: 1px solid #86efac;
-}
+.badge-critical { background: var(--critical-bg); color: var(--critical-text); }
+.badge-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
+.badge-high { background: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+.badge-medium { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+.badge-low { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
 
 /* ===== DETAILS PAGE ===== */
 .details-page { background: var(--bg); }
@@ -466,7 +573,7 @@ tr.row-no-contact td:nth-child(8) { color: var(--primary); font-weight: 700; }
 }
 
 .detail-section h2 {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 1rem;
@@ -497,17 +604,155 @@ dd {
 
 .pre-wrap { white-space: pre-wrap; }
 
+/* ===== LOGIN PAGE ===== */
+.login-page {
+    background: linear-gradient(135deg, #f0f2f5 0%, #e8eaf0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2.25rem;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.login-logo {
+    margin-bottom: 1rem;
+}
+
+.login-logo svg {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(218, 33, 40, 0.3);
+}
+
+.login-card h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    margin-bottom: 0.35rem;
+}
+
+.login-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 1.75rem;
+}
+
+.login-error {
+    background: var(--danger-bg);
+    border: 1px solid rgba(218,33,40,0.2);
+    border-left: 4px solid var(--primary);
+    color: var(--primary);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.login-form { text-align: left; }
+
+.login-field {
+    margin-bottom: 1.1rem;
+}
+
+.login-field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.01em;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #fafbfc;
+    color: var(--text);
+    transition: all 0.2s;
+}
+
+.login-field input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+    background: #fff;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(218, 33, 40, 0.3);
+    letter-spacing: 0.02em;
+    margin-top: 0.5rem;
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #9a151a 100%);
+    box-shadow: 0 4px 16px rgba(218, 33, 40, 0.4);
+    transform: translateY(-1px);
+}
+
+.login-btn:active { transform: translateY(0); }
+
+.login-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    padding-top: 1rem;
+}
+
+.login-note a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-note a:hover { text-decoration: underline; }
+
 /* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .page-header { padding: 1rem 1.25rem; }
+    .page-header h1 { font-size: 1.1rem; }
+    .header-link, .header-logout { font-size: 0.78rem; padding: 0.35rem 0.65rem; }
+}
+
 @media (max-width: 768px) {
-    .page-header { padding: 1.25rem 1rem; }
-    .page-header h1 { font-size: 1.25rem; }
-    .form-row { flex-direction: column; gap: 0; }
+    .form-row { flex-direction: column; gap: 0; padding-left: 0; padding-right: 0; }
+    .form-group.half { padding-left: 0 !important; padding-right: 0 !important; }
     .filter-row { flex-direction: column; }
     dl { grid-template-columns: 1fr; gap: 0.25rem; }
     dt { margin-top: 0.5rem; }
     .truncate { max-width: 120px; }
-    table { font-size: 0.82rem; }
+    table { font-size: 0.8rem; }
     th, td { padding: 0.5rem; }
-    fieldset { padding: 1.25rem 1.25rem; }
-    .detail-section { padding: 1.25rem; }
+    .add-admin-row { flex-direction: column; }
+    .header-right { gap: 0.4rem; }
 }
