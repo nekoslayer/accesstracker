@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login — AccessTracker</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
+            --primary-glow: rgba(218,33,40,0.12);
+            --bg: #f0f2f5; --surface: #fff; --text: #1c1c2e; --text-muted: #8892a4;
+            --border: #e2e5ec; --border-light: #eef1f6;
+            --danger-bg: #fef2f2;
+            --radius: 8px; --radius-lg: 12px;
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+        }
+        html { font-size: 16px; }
+        body {
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e8eaf0 100%);
+            color: var(--text); line-height: 1.65; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+        }
+        .login-wrapper { width: 100%; max-width: 420px; }
+        .login-card {
+            background: var(--surface); border-radius: var(--radius-lg);
+            padding: 2.5rem 2.25rem; box-shadow: var(--shadow-lg); text-align: center;
+        }
+        .login-logo { margin-bottom: 1rem; }
+        .login-logo svg { border-radius: 10px; box-shadow: 0 4px 16px rgba(218,33,40,0.3); }
+        .login-card h1 { font-size: 1.6rem; font-weight: 800; color: var(--text); letter-spacing: -0.03em; margin-bottom: 0.35rem; }
+        .login-subtitle { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.75rem; }
+        .login-error {
+            background: var(--danger-bg); border: 1px solid rgba(218,33,40,0.2);
+            border-left: 4px solid var(--primary); color: var(--primary);
+            padding: 0.75rem 1rem; border-radius: var(--radius); font-size: 0.88rem;
+            font-weight: 600; margin-bottom: 1.25rem; text-align: left;
+        }
+        .login-form { text-align: left; }
+        .login-field { margin-bottom: 1.1rem; }
+        .login-field label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; letter-spacing: 0.01em; }
+        .login-field input {
+            width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid var(--border);
+            border-radius: var(--radius); font-size: 0.95rem; font-family: inherit;
+            background: #fafbfc; color: var(--text); transition: all 0.2s;
+        }
+        .login-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); background: #fff; }
+        .login-btn {
+            width: 100%; padding: 0.75rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; border: none; border-radius: var(--radius); font-size: 1rem;
+            font-weight: 700; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(218,33,40,0.3); letter-spacing: 0.02em; margin-top: 0.5rem;
+        }
+        .login-btn:hover { background: linear-gradient(135deg, var(--primary-dark) 0%, #9a151a 100%); box-shadow: 0 4px 16px rgba(218,33,40,0.4); transform: translateY(-1px); }
+        .login-note { font-size: 0.8rem; color: var(--text-muted); margin-top: 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1rem; }
+        .login-note a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .login-note a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="10" fill="#DA2128"/>
+                    <path d="M20 8C15.6 8 12 11.6 12 16v2H10v14h20V18h-2v-2c0-4.4-3.6-8-8-8zm0 3c2.8 0 5 2.2 5 5v2h-10v-2c0-2.8 2.2-5 5-5zm0 10a2 2 0 110 4 2 2 0 010-4z" fill="white"/>
+                </svg>
+            </div>
+            <h1>AccessTracker</h1>
+            <p class="login-subtitle">Sign in to access the dashboard</p>
+
+            <!-- Uncomment to preview error state -->
+            <!-- <div class="login-error">Invalid username or password.</div> -->
+
+            <form class="login-form" onsubmit="return false">
+                <div class="login-field">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="Username" placeholder="ADMIN" autocomplete="username" autofocus />
+                </div>
+                <div class="login-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="Password" placeholder="••••••••" autocomplete="current-password" />
+                </div>
+                <button type="button" class="login-btn" onclick="window.location='dashboard.html'">Sign In</button>
+            </form>
+
+            <p class="login-note">Submit page is publicly accessible at <a href="submit.html">/Submit</a></p>
+        </div>
+    </div>
+</body>
+</html>

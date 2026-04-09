@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Access Record — AccessTracker</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
+            --primary-glow: rgba(218,33,40,0.12);
+            --bg: #f0f2f5; --surface: #fff; --text: #1c1c2e; --text-secondary: #4a5568;
+            --text-muted: #8892a4; --border: #e2e5ec;
+            --radius: 8px; --radius-lg: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+        }
+        html { font-size: 16px; }
+        body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; padding: 1.25rem 2rem;
+            box-shadow: 0 2px 12px rgba(218,33,40,0.2);
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        }
+        .header-left { flex: 1; min-width: 0; }
+        .page-header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #fff; }
+        .page-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 0.15rem; }
+        .header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+        .header-link { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 0.4rem 0.9rem; border: 1.5px solid rgba(255,255,255,0.4); border-radius: var(--radius); transition: all 0.2s; }
+        .header-link:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .header-logout { background: rgba(0,0,0,0.2); color: #fff; border: 1.5px solid rgba(255,255,255,0.3); border-radius: var(--radius); padding: 0.4rem 0.9rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .header-logout:hover { background: rgba(0,0,0,0.35); }
+
+        .container { margin: 0 auto; padding: 2rem 1.5rem; max-width: 760px; }
+
+        /* Fieldset — accent stripe via ::before block, legend floated */
+        fieldset {
+            border: none; border-radius: var(--radius-lg); padding: 0;
+            margin-bottom: 1.25rem; background: var(--surface); box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        fieldset::before {
+            content: ''; display: block; height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        legend {
+            display: block; float: left; width: 100%;
+            padding: 0.85rem 1.75rem 0;
+            font-size: 0.78rem; font-weight: 700; color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        fieldset::after { content: ''; display: table; clear: both; }
+        fieldset .form-group, fieldset .form-row, fieldset .checkbox-group {
+            padding-left: 1.75rem; padding-right: 1.75rem;
+        }
+        fieldset .form-group:first-of-type, fieldset .form-row:first-of-type { padding-top: 0.85rem; }
+        fieldset .form-group:last-child, fieldset .form-row:last-child, fieldset .checkbox-group:last-child { padding-bottom: 1.5rem; }
+
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem; color: var(--text); letter-spacing: 0.01em; }
+        .req { color: var(--primary); font-weight: 700; }
+        .form-group input[type="text"], .form-group input[type="url"], .form-group input[type="email"],
+        .form-group input[type="date"], .form-group select, .form-group textarea {
+            width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+            font-size: 0.95rem; font-family: inherit; background: #fafbfc; color: var(--text); transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); background: #fff;
+        }
+        .form-group textarea { resize: vertical; }
+        .checkbox-group label { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer; color: var(--text-secondary); }
+        .checkbox-group input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: var(--primary); }
+        .form-row { display: flex; gap: 1rem; }
+        .form-group.half { flex: 1; }
+
+        .form-actions { margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-block; padding: 0.75rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; border: none; border-radius: var(--radius); font-size: 1rem;
+            font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(218,33,40,0.25); letter-spacing: 0.02em;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(218,33,40,0.35); }
+        .btn-back { background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 2px 8px rgba(71,85,105,0.2); }
+        .btn-back:hover { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); }
+
+        .success-banner { background: #ecfdf5; border-left: 4px solid #34d399; color: #065f46; padding: 1.25rem 1.5rem; border-radius: var(--radius); font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; }
+
+        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 0; } }
+        @media (max-width: 900px) { .page-header h1 { font-size: 1.1rem; } .header-link, .header-logout { font-size: 0.78rem; padding: 0.35rem 0.65rem; } }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Edit Access Record</h1>
+            <div class="subtitle">Update an existing access record</div>
+        </div>
+        <div class="header-right">
+            <a href="dashboard.html" class="header-link">Dashboard</a>
+            <button class="header-logout" onclick="window.location='login.html'">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="container" id="pageContent"></div>
+
+    <script>
+        var records = {
+            "a1b2c3d4-e5f6-7890-abcd-ef1234567890": {
+                id:"a1b2c3d4-e5f6-7890-abcd-ef1234567890", fullName:"Ahmet Yilmaz", username:"ayilmaz",
+                department:"IT", jobTitle:"System Administrator", systemName:"Azure DevOps",
+                url:"https://dev.azure.com/company", category:"Dev Tool", accountType:"Individual",
+                accessType:"Admin", accessTypeOther:"", authMethod:"SSO",
+                businessReason:"Manage CI/CD pipelines, code repositories, and project boards for all engineering teams. Required for daily operations and release management.",
+                businessProcess:"Software Development Lifecycle", impact:"Critical",
+                secondaryName:"Mehmet Demir", secondaryEmail:"mdemir@company.com",
+                unavailPlan:"Mehmet Demir has equivalent admin access and can handle all DevOps operations.",
+                startDate:"2025-01-10", endDate:"", tempAccess:false,
+                criticality:"Critical", backup:"Break-glass account stored in IT vault",
+                notes:"Also manages service connections for production deployments."
+            }
+        };
+
+        var params = new URLSearchParams(window.location.search);
+        var id = params.get('id') || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+        var s = records[id] || records["a1b2c3d4-e5f6-7890-abcd-ef1234567890"];
+        var container = document.getElementById('pageContent');
+
+        function opt(val, opts) {
+            return opts.map(function(o) {
+                return '<option value="'+o+'"'+(o===val?' selected':'')+'>'+o+'</option>';
+            }).join('');
+        }
+        function critOpt(val) {
+            var opts = [
+                {v:"Low",l:"Low - Minimal business impact"},
+                {v:"Medium",l:"Medium - Noticeable disruption"},
+                {v:"High",l:"High - Significant operational impact"},
+                {v:"Critical",l:"Critical - Business cannot function"}
+            ];
+            return opts.map(function(o) {
+                return '<option value="'+o.v+'"'+(o.v===val?' selected':'')+'>'+o.l+'</option>';
+            }).join('');
+        }
+
+        container.innerHTML = '<form onsubmit="showSuccess(event)">'+
+        '<fieldset>'+
+          '<legend>User Information</legend>'+
+          '<div class="form-group"><label>Full Name <span class="req">*</span></label><input type="text" value="'+s.fullName+'" required /></div>'+
+          '<div class="form-group"><label>Username <span class="req">*</span></label><input type="text" value="'+s.username+'" required /></div>'+
+          '<div class="form-group"><label>Department</label><select>'+
+            '<option value="">-- Select --</option>'+
+            opt(s.department,["Accounting","Administration","Business Development","Customer Service","Engineering","Finance","Human Resources","IT","Legal","Marketing","Operations","Procurement","Quality Assurance","Sales"])+
+          '</select></div>'+
+          '<div class="form-group"><label>Job Title</label><input type="text" value="'+s.jobTitle+'" /></div>'+
+        '</fieldset>'+
+
+        '<fieldset>'+
+          '<legend>System Information</legend>'+
+          '<div class="form-group"><label>System Name <span class="req">*</span></label><input type="text" value="'+s.systemName+'" required /></div>'+
+          '<div class="form-group"><label>URL</label><input type="url" value="'+s.url+'" /></div>'+
+          '<div class="form-group"><label>Category</label><select>'+
+            '<option value="">-- Select --</option>'+opt(s.category,["Finance","HR","E-Signature","CRM","Dev Tool","Other"])+'</select></div>'+
+          '<div class="form-group"><label>Account Type</label><select>'+
+            '<option value="">-- Select --</option>'+opt(s.accountType,["Individual","Shared","Service"])+'</select></div>'+
+        '</fieldset>'+
+
+        '<fieldset>'+
+          '<legend>Access Details</legend>'+
+          '<div class="form-group"><label>Access Type</label><select>'+
+            '<option value="">-- Select --</option>'+opt(s.accessType,["Read","Write","Admin","Other"])+'</select></div>'+
+          '<div class="form-group"><label>Authentication Method</label><select>'+
+            '<option value="">-- Select --</option>'+opt(s.authMethod,["Username/Password","SSO","MFA","API Key","Other"])+'</select></div>'+
+        '</fieldset>'+
+
+        '<fieldset>'+
+          '<legend>Business Context</legend>'+
+          '<div class="form-group"><label>Business Reason <span class="req">*</span></label><textarea rows="5" required>'+s.businessReason+'</textarea></div>'+
+          '<div class="form-group"><label>Business Process</label><textarea rows="3">'+s.businessProcess+'</textarea></div>'+
+          '<div class="form-group"><label>Impact if Lost</label><select>'+
+            '<option value="">-- Select --</option>'+opt(s.impact,["Low","Medium","High","Critical"])+'</select></div>'+
+        '</fieldset>'+
+
+        '<fieldset>'+
+          '<legend>Continuity Plan</legend>'+
+          '<div class="form-group"><label>Secondary Contact Name <span class="req">*</span></label><input type="text" value="'+s.secondaryName+'" required /></div>'+
+          '<div class="form-group"><label>Secondary Contact Email</label><input type="email" value="'+s.secondaryEmail+'" /></div>'+
+          '<div class="form-group"><label>What should be done if user is unavailable <span class="req">*</span></label><textarea rows="4" required>'+s.unavailPlan+'</textarea></div>'+
+        '</fieldset>'+
+
+        '<fieldset>'+
+          '<legend>Lifecycle</legend>'+
+          '<div class="form-row">'+
+            '<div class="form-group half"><label>Start Date</label><input type="date" value="'+s.startDate+'" /></div>'+
+            '<div class="form-group half"><label>End Date</label><input type="date" value="'+s.endDate+'" /></div>'+
+          '</div>'+
+          '<div class="form-group checkbox-group"><label><input type="checkbox"'+(s.tempAccess?' checked':'')+' /> Temporary Access</label></div>'+
+        '</fieldset>'+
+
+        '<fieldset>'+
+          '<legend>Additional Information</legend>'+
+          '<div class="form-group"><label>System Criticality Level</label><select>'+
+            '<option value="">-- Select --</option>'+critOpt(s.criticality)+'</select></div>'+
+          '<div class="form-group"><label>Backup Access Method</label><textarea rows="3">'+s.backup+'</textarea></div>'+
+          '<div class="form-group"><label>Notes</label><textarea rows="3">'+s.notes+'</textarea></div>'+
+        '</fieldset>'+
+
+        '<div class="form-actions">'+
+          '<a href="details.html?id='+id+'" class="btn btn-back">Cancel</a>'+
+          '<button type="submit" class="btn">Save Changes</button>'+
+        '</div>'+
+        '</form>';
+
+        function showSuccess(e) {
+            e.preventDefault();
+            container.innerHTML =
+                '<div class="success-banner">Record updated successfully.</div>'+
+                '<div class="form-actions">'+
+                  '<a href="details.html?id='+id+'" class="btn">View Record</a>'+
+                  '<a href="dashboard.html" class="btn btn-back">Dashboard</a>'+
+                '</div>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Accounts — AccessTracker</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
+            --primary-glow: rgba(218,33,40,0.12);
+            --bg: #f0f2f5; --surface: #fff; --text: #1c1c2e; --text-secondary: #4a5568;
+            --text-muted: #8892a4; --border: #e2e5ec; --border-light: #eef1f6;
+            --danger-bg: #fef2f2; --success-bg: #ecfdf5; --success-text: #065f46;
+            --radius: 8px; --radius-lg: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+        }
+        html { font-size: 16px; }
+        body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; padding: 1.25rem 2rem;
+            box-shadow: 0 2px 12px rgba(218,33,40,0.2);
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        }
+        .header-left { flex: 1; min-width: 0; }
+        .page-header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #fff; }
+        .page-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 0.15rem; }
+        .header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+        .header-link { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 0.4rem 0.9rem; border: 1.5px solid rgba(255,255,255,0.4); border-radius: var(--radius); transition: all 0.2s; }
+        .header-link:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .header-logout { background: rgba(0,0,0,0.2); color: #fff; border: 1.5px solid rgba(255,255,255,0.3); border-radius: var(--radius); padding: 0.4rem 0.9rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .header-logout:hover { background: rgba(0,0,0,0.35); }
+
+        .container { margin: 0 auto; padding: 2rem 1.5rem; max-width: 760px; }
+
+        /* Add admin card */
+        .detail-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 2rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .detail-section::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .detail-section h2 { font-size: 0.78rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .add-admin-row { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
+        .form-group { margin-bottom: 0; flex: 1; min-width: 140px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.85rem; color: var(--text); }
+        .form-group input {
+            width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+            font-size: 0.95rem; font-family: inherit; background: #fafbfc; color: var(--text); transition: all 0.2s;
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); background: #fff; }
+
+        .btn {
+            display: inline-block; padding: 0.65rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; border: none; border-radius: var(--radius); font-size: 0.9rem;
+            font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(218,33,40,0.25); white-space: nowrap;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(218,33,40,0.35); }
+
+        /* Feedback banners */
+        .success-banner { background: var(--success-bg); border-left: 4px solid #34d399; color: var(--success-text); padding: 0.85rem 1.1rem; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; }
+        .validation-errors { background: var(--danger-bg); border-left: 4px solid var(--primary); color: var(--primary); padding: 0.85rem 1.1rem; border-radius: var(--radius); font-size: 0.9rem; font-weight: 500; margin-bottom: 1rem; }
+
+        /* Table */
+        .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+        table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.875rem; }
+        thead { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+        th { text-align: left; padding: 0.75rem 0.85rem; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; }
+        td { padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
+        .badge-critical { background: var(--primary); color: #fff; }
+
+        .btn-danger { background: none; border: 1.5px solid var(--primary); color: var(--primary); border-radius: var(--radius); padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-danger:hover { background: var(--primary); color: #fff; }
+
+        @media (max-width: 768px) { .add-admin-row { flex-direction: column; } .form-group { min-width: unset; } }
+        @media (max-width: 900px) { .page-header h1 { font-size: 1.1rem; } .header-link, .header-logout { font-size: 0.78rem; padding: 0.35rem 0.65rem; } }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Admin Accounts</h1>
+            <div class="subtitle">Manage who can access the dashboard</div>
+        </div>
+        <div class="header-right">
+            <a href="dashboard.html" class="header-link">Dashboard</a>
+            <button class="header-logout" onclick="window.location='login.html'">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="banner"></div>
+
+        <div class="detail-section">
+            <h2>Add New Admin</h2>
+            <div class="add-admin-row">
+                <div class="form-group">
+                    <label for="newUser">Username</label>
+                    <input type="text" id="newUser" placeholder="e.g. john.doe" />
+                </div>
+                <div class="form-group">
+                    <label for="newPass">Password</label>
+                    <input type="password" id="newPass" placeholder="Min. 6 characters" />
+                </div>
+                <div class="form-group">
+                    <label for="confPass">Confirm Password</label>
+                    <input type="password" id="confPass" placeholder="Repeat password" />
+                </div>
+                <button class="btn" onclick="addAdmin()">Add Admin</button>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Username</th><th>Created</th><th style="width:90px;">Action</th></tr>
+                </thead>
+                <tbody id="adminTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var admins = [
+            { id:"1", username:"ADMIN", createdAt:"2026-01-01 00:00", isDefault:true },
+            { id:"2", username:"hr.manager", createdAt:"2026-03-10 09:15", isDefault:false }
+        ];
+
+        function renderTable() {
+            var tb = document.getElementById('adminTable');
+            tb.innerHTML = '';
+            admins.forEach(function(a) {
+                var tr = document.createElement('tr');
+                var deleteCell = admins.length > 1
+                    ? '<button class="btn-danger" onclick="deleteAdmin(\''+a.id+'\',\''+a.username+'\')">Delete</button>'
+                    : '<span style="font-size:0.78rem;color:var(--text-muted);">Last admin</span>';
+                tr.innerHTML =
+                    '<td>'+a.username+(a.isDefault?'&nbsp;<span class="badge badge-critical">DEFAULT</span>':'')+'</td>'+
+                    '<td>'+a.createdAt+'</td>'+
+                    '<td>'+deleteCell+'</td>';
+                tb.appendChild(tr);
+            });
+        }
+
+        function showBanner(msg, isError) {
+            var b = document.getElementById('banner');
+            b.innerHTML = '<div class="'+(isError?'validation-errors':'success-banner')+'">'+msg+'</div>';
+            setTimeout(function() { b.innerHTML = ''; }, 4000);
+        }
+
+        function addAdmin() {
+            var u = document.getElementById('newUser').value.trim();
+            var p = document.getElementById('newPass').value;
+            var c = document.getElementById('confPass').value;
+            if (!u || !p) { showBanner('Username and password are required.', true); return; }
+            if (p.length < 6) { showBanner('Password must be at least 6 characters.', true); return; }
+            if (p !== c) { showBanner('Passwords do not match.', true); return; }
+            if (admins.some(function(a){ return a.username.toLowerCase()===u.toLowerCase(); })) {
+                showBanner("Username '"+u+"' already exists.", true); return;
+            }
+            admins.push({ id: String(Date.now()), username: u, createdAt: new Date().toISOString().replace('T',' ').slice(0,16), isDefault:false });
+            document.getElementById('newUser').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('confPass').value = '';
+            renderTable();
+            showBanner("Admin account '"+u+"' created successfully.", false);
+        }
+
+        function deleteAdmin(id, name) {
+            if (admins.length <= 1) { showBanner('Cannot delete the last admin account.', true); return; }
+            if (!confirm('Delete '+name+'?')) return;
+            admins = admins.filter(function(a){ return a.id !== id; });
+            renderTable();
+            showBanner('Admin account deleted.', false);
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>

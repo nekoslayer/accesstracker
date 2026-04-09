@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Record Details</title>
+    <title>Record Details — AccessTracker</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
-            --bg: #f0f2f5; --surface: #ffffff; --text: #1c1c2e; --text-secondary: #4a5568;
+            --primary-glow: rgba(218,33,40,0.12);
+            --bg: #f0f2f5; --surface: #fff; --text: #1c1c2e; --text-secondary: #4a5568;
             --text-muted: #8892a4; --border: #e2e5ec; --border-light: #eef1f6;
             --warn-bg: #fffbeb; --warn-text: #92400e; --warn-border: #fbbf24;
             --radius: 8px; --radius-lg: 12px;
@@ -18,36 +19,37 @@
         html { font-size: 16px; }
         body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
 
+        /* Header */
         .page-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff; padding: 1.75rem 2rem;
+            color: #fff; padding: 1.25rem 2rem;
             box-shadow: 0 2px 12px rgba(218,33,40,0.2);
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
         }
-        .page-header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
-        .page-header .subtitle { font-size: 0.88rem; opacity: 0.85; margin-top: 0.25rem; }
+        .header-left { flex: 1; min-width: 0; }
+        .page-header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #fff; }
+        .page-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 0.15rem; }
+        .header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+        .header-link {
+            color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            padding: 0.4rem 0.9rem; border: 1.5px solid rgba(255,255,255,0.4); border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+        .header-link:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.7); color: #fff; }
+        .header-logout {
+            background: rgba(0,0,0,0.2); color: #fff; border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius); padding: 0.4rem 0.9rem; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .header-logout:hover { background: rgba(0,0,0,0.35); }
 
         .container { margin: 0 auto; padding: 1.75rem 1.5rem; max-width: 760px; }
 
-        .meta {
-            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;
-            background: var(--surface); padding: 0.75rem 1rem; border-radius: var(--radius);
-            box-shadow: var(--shadow-sm); border-left: 3px solid var(--primary);
-        }
+        .meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; background: var(--surface); padding: 0.75rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); border-left: 3px solid var(--primary); }
 
-        .detail-section {
-            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
-            padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; box-shadow: var(--shadow);
-            position: relative; overflow: hidden;
-        }
-        .detail-section::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--primary);
-        }
-        .detail-section h2 {
-            font-size: 0.82rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem;
-            padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light);
-            text-transform: uppercase; letter-spacing: 0.05em;
-        }
+        .detail-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .detail-section::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .detail-section h2 { font-size: 0.78rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); text-transform: uppercase; letter-spacing: 0.05em; }
 
         dl { display: grid; grid-template-columns: 200px 1fr; gap: 0.6rem 1.25rem; }
         dt { font-weight: 600; font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
@@ -61,21 +63,32 @@
         .badge-low { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
         .badge-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
 
-        .form-actions { margin-top: 1.5rem; text-align: center; }
+        .form-actions { margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
         .btn {
-            display: inline-block; padding: 0.7rem 2rem; color: #fff; border: none; border-radius: var(--radius);
-            font-size: 1rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s;
+            display: inline-block; padding: 0.75rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff; border: none; border-radius: var(--radius); font-size: 1rem;
+            font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(218,33,40,0.25); letter-spacing: 0.02em;
         }
+        .btn:hover { background: linear-gradient(135deg, var(--primary-dark) 0%, #9a151a 100%); transform: translateY(-1px); }
         .btn-back { background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 2px 8px rgba(71,85,105,0.2); }
-        .btn-back:hover { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); box-shadow: 0 4px 16px rgba(71,85,105,0.3); transform: translateY(-1px); }
+        .btn-back:hover { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); }
 
-        @media (max-width: 768px) { dl { grid-template-columns: 1fr; gap: 0.25rem; } dt { margin-top: 0.5rem; } .detail-section { padding: 1.25rem; } .page-header { padding: 1.25rem 1rem; } .page-header h1 { font-size: 1.25rem; } }
+        @media (max-width: 768px) { dl { grid-template-columns: 1fr; gap: 0.25rem; } dt { margin-top: 0.5rem; } .detail-section { padding: 1.25rem; } }
+        @media (max-width: 900px) { .page-header h1 { font-size: 1.1rem; } .header-link, .header-logout { font-size: 0.78rem; padding: 0.35rem 0.65rem; } }
     </style>
 </head>
 <body>
     <div class="page-header">
-        <h1>Access Record Details</h1>
-        <div class="subtitle">Full view of a submitted access record</div>
+        <div class="header-left">
+            <h1>Access Record Details</h1>
+            <div class="subtitle">Full view of a submitted access record</div>
+        </div>
+        <div class="header-right">
+            <a href="dashboard.html" class="header-link">Dashboard</a>
+            <button class="header-logout" onclick="window.location='login.html'">Sign Out</button>
+        </div>
     </div>
 
     <div class="container" id="content"></div>
@@ -144,14 +157,14 @@
             }
         };
 
-        function critBadge(level) {
-            if (!level) return '\u2014';
-            return '<span class="badge badge-' + level.toLowerCase() + '">' + level + '</span>';
+        function critBadge(l) {
+            if (!l) return '\u2014';
+            return '<span class="badge badge-'+l.toLowerCase()+'">'+l+'</span>';
         }
-        function impactBadge(level) {
-            if (level === 'Critical') return '<span class="badge badge-critical">' + level + '</span>';
-            if (level === 'High') return '<span class="badge badge-warn">' + level + '</span>';
-            return level || '\u2014';
+        function impactBadge(l) {
+            if (l === 'Critical') return '<span class="badge badge-critical">'+l+'</span>';
+            if (l === 'High') return '<span class="badge badge-warn">'+l+'</span>';
+            return l || '\u2014';
         }
 
         var params = new URLSearchParams(window.location.search);
@@ -159,56 +172,59 @@
         var container = document.getElementById('content');
 
         if (!records[id]) {
-            container.innerHTML = '<h1 style="margin-top:1rem">Record Not Found</h1><p>The requested record does not exist.</p>';
+            container.innerHTML = '<p style="color:var(--text-muted);padding:3rem;text-align:center;">Record not found.</p><div class="form-actions"><a href="dashboard.html" class="btn btn-back">Back to Dashboard</a></div>';
         } else {
             var s = records[id];
             container.innerHTML =
-                '<p class="meta">ID: ' + id + ' &mdash; Created: ' + s.createdAt + '</p>' +
+                '<p class="meta">ID: '+id+' &mdash; Created: '+s.createdAt+'</p>'+
 
-                '<section class="detail-section"><h2>User Information</h2><dl>' +
-                '<dt>Full Name</dt><dd>' + s.fullName + '</dd>' +
-                '<dt>Username</dt><dd>' + s.username + '</dd>' +
-                '<dt>Department</dt><dd>' + s.department + '</dd>' +
-                '<dt>Job Title</dt><dd>' + s.jobTitle + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>User Information</h2><dl>'+
+                '<dt>Full Name</dt><dd>'+s.fullName+'</dd>'+
+                '<dt>Username</dt><dd>'+s.username+'</dd>'+
+                '<dt>Department</dt><dd>'+s.department+'</dd>'+
+                '<dt>Job Title</dt><dd>'+s.jobTitle+'</dd>'+
+                '</dl></section>'+
 
-                '<section class="detail-section"><h2>System Information</h2><dl>' +
-                '<dt>System Name</dt><dd>' + s.systemName + '</dd>' +
-                '<dt>URL</dt><dd>' + (s.url || '\u2014') + '</dd>' +
-                '<dt>Category</dt><dd>' + s.category + '</dd>' +
-                '<dt>Account Type</dt><dd>' + s.accountType + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>System Information</h2><dl>'+
+                '<dt>System Name</dt><dd>'+s.systemName+'</dd>'+
+                '<dt>URL</dt><dd>'+(s.url||'\u2014')+'</dd>'+
+                '<dt>Category</dt><dd>'+s.category+'</dd>'+
+                '<dt>Account Type</dt><dd>'+s.accountType+'</dd>'+
+                '</dl></section>'+
 
-                '<section class="detail-section"><h2>Access Details</h2><dl>' +
-                '<dt>Access Type</dt><dd>' + s.accessType + '</dd>' +
-                '<dt>Authentication</dt><dd>' + s.authMethod + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>Access Details</h2><dl>'+
+                '<dt>Access Type</dt><dd>'+s.accessType+'</dd>'+
+                '<dt>Authentication</dt><dd>'+s.authMethod+'</dd>'+
+                '</dl></section>'+
 
-                '<section class="detail-section"><h2>Business Context</h2><dl>' +
-                '<dt>Business Reason</dt><dd class="pre-wrap">' + s.businessReason + '</dd>' +
-                '<dt>Business Process</dt><dd class="pre-wrap">' + (s.businessProcess || '\u2014') + '</dd>' +
-                '<dt>Impact if Lost</dt><dd>' + impactBadge(s.impact) + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>Business Context</h2><dl>'+
+                '<dt>Business Reason</dt><dd class="pre-wrap">'+s.businessReason+'</dd>'+
+                '<dt>Business Process</dt><dd class="pre-wrap">'+(s.businessProcess||'\u2014')+'</dd>'+
+                '<dt>Impact if Lost</dt><dd>'+impactBadge(s.impact)+'</dd>'+
+                '</dl></section>'+
 
-                '<section class="detail-section"><h2>Continuity Plan</h2><dl>' +
-                '<dt>Secondary Contact</dt><dd>' + (s.secondaryName || '\u2014') + '</dd>' +
-                '<dt>Contact Email</dt><dd>' + (s.secondaryEmail || '\u2014') + '</dd>' +
-                '<dt>Unavailability Plan</dt><dd class="pre-wrap">' + s.unavailPlan + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>Continuity Plan</h2><dl>'+
+                '<dt>Secondary Contact</dt><dd>'+(s.secondaryName||'\u2014')+'</dd>'+
+                '<dt>Contact Email</dt><dd>'+(s.secondaryEmail||'\u2014')+'</dd>'+
+                '<dt>Unavailability Plan</dt><dd class="pre-wrap">'+s.unavailPlan+'</dd>'+
+                '</dl></section>'+
 
-                '<section class="detail-section"><h2>Lifecycle</h2><dl>' +
-                '<dt>Start Date</dt><dd>' + (s.startDate || '\u2014') + '</dd>' +
-                '<dt>End Date</dt><dd>' + (s.endDate || '\u2014') + '</dd>' +
-                '<dt>Temporary Access</dt><dd>' + (s.tempAccess ? 'Yes' : 'No') + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>Lifecycle</h2><dl>'+
+                '<dt>Start Date</dt><dd>'+(s.startDate||'\u2014')+'</dd>'+
+                '<dt>End Date</dt><dd>'+(s.endDate||'\u2014')+'</dd>'+
+                '<dt>Temporary Access</dt><dd>'+(s.tempAccess?'Yes':'No')+'</dd>'+
+                '</dl></section>'+
 
-                '<section class="detail-section"><h2>Additional Information</h2><dl>' +
-                '<dt>Criticality Level</dt><dd>' + critBadge(s.criticality) + '</dd>' +
-                '<dt>Backup Access Method</dt><dd class="pre-wrap">' + (s.backup || '\u2014') + '</dd>' +
-                '<dt>Notes</dt><dd class="pre-wrap">' + (s.notes || '\u2014') + '</dd>' +
-                '</dl></section>' +
+                '<section class="detail-section"><h2>Additional Information</h2><dl>'+
+                '<dt>Criticality Level</dt><dd>'+critBadge(s.criticality)+'</dd>'+
+                '<dt>Backup Access Method</dt><dd class="pre-wrap">'+(s.backup||'\u2014')+'</dd>'+
+                '<dt>Notes</dt><dd class="pre-wrap">'+(s.notes||'\u2014')+'</dd>'+
+                '</dl></section>'+
 
-                '<div class="form-actions"><a href="dashboard.html" class="btn btn-back">Back to Dashboard</a></div>';
+                '<div class="form-actions">'+
+                  '<a href="edit.html?id='+id+'" class="btn">Edit Record</a>'+
+                  '<a href="dashboard.html" class="btn btn-back">Back to Dashboard</a>'+
+                '</div>';
         }
     </script>
 </body>

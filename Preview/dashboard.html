@@ -3,17 +3,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Access Records Dashboard</title>
+    <title>Access Records Dashboard — AccessTracker</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary: #DA2128; --primary-dark: #b81b21; --primary-light: #fdeaea;
             --primary-glow: rgba(218,33,40,0.12);
-            --bg: #f0f2f5; --surface: #ffffff; --text: #1c1c2e; --text-secondary: #4a5568;
+            --bg: #f0f2f5; --surface: #fff; --text: #1c1c2e; --text-secondary: #4a5568;
             --text-muted: #8892a4; --border: #e2e5ec; --border-light: #eef1f6;
+            --warn-bg: #fffbeb; --warn-text: #92400e; --warn-border: #fbbf24;
             --danger-row: #fff5f5; --danger-row-hover: #fee2e2;
             --expiring-row: #fffbeb; --expiring-row-hover: #fef3c7;
-            --warn-bg: #fffbeb; --warn-text: #92400e; --warn-border: #fbbf24;
             --radius: 8px; --radius-lg: 12px;
             --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
@@ -21,46 +21,59 @@
         html { font-size: 16px; }
         body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
 
+        /* Header */
         .page-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #fff; padding: 1.75rem 2rem;
+            color: #fff; padding: 1.25rem 2rem;
             box-shadow: 0 2px 12px rgba(218,33,40,0.2);
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
         }
-        .page-header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
-        .page-header .subtitle { font-size: 0.88rem; opacity: 0.85; margin-top: 0.25rem; }
-
-        .container { margin: 0 auto; padding: 1.75rem 1.5rem; max-width: 1260px; }
-
-        .filters {
-            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
-            padding: 1.15rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow);
+        .header-left { flex: 1; min-width: 0; }
+        .page-header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #fff; }
+        .page-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 0.15rem; }
+        .header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+        .header-link {
+            color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            padding: 0.4rem 0.9rem; border: 1.5px solid rgba(255,255,255,0.4); border-radius: var(--radius);
+            transition: all 0.2s; white-space: nowrap;
         }
+        .header-link:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.7); color: #fff; }
+        .header-logout {
+            background: rgba(0,0,0,0.2); color: #fff; border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius); padding: 0.4rem 0.9rem; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .header-logout:hover { background: rgba(0,0,0,0.35); }
+
+        /* Layout */
+        .container { margin: 0 auto; padding: 1.75rem 1.5rem; max-width: 1320px; }
+
+        /* Filters */
+        .filters { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.15rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
         .filter-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
         .filter-item { display: flex; flex-direction: column; gap: 0.3rem; }
-        .filter-item label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .filter-item label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .filter-item input[type="text"], .filter-item select {
             padding: 0.5rem 0.7rem; border: 1.5px solid var(--border); border-radius: var(--radius);
-            font-size: 0.9rem; font-family: inherit; background: #fafbfc; transition: border-color 0.2s;
+            font-size: 0.9rem; font-family: inherit; background: #fafbfc;
         }
         .filter-item input:focus, .filter-item select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
         .checkbox-filter label { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; padding-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); }
         .checkbox-filter input[type="checkbox"] { accent-color: var(--primary); }
-        .filter-item button {
-            padding: 0.5rem 1.5rem; background: var(--primary); color: #fff; border: none; border-radius: var(--radius);
-            cursor: pointer; font-size: 0.88rem; font-weight: 700; transition: all 0.2s; letter-spacing: 0.02em;
-        }
-        .filter-item button:hover { background: var(--primary-dark); box-shadow: 0 2px 8px rgba(218,33,40,0.2); }
+        .filter-item button { padding: 0.5rem 1.5rem; background: var(--primary); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.88rem; font-weight: 700; transition: all 0.2s; }
+        .filter-item button:hover { background: var(--primary-dark); }
 
         .record-count { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
 
+        /* Table */
         .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
-        table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.875rem; }
         thead { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
-        th { text-align: left; padding: 0.8rem 0.85rem; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; }
-        td { padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+        th { text-align: left; padding: 0.75rem 0.85rem; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; white-space: nowrap; }
+        td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
         tr.clickable { cursor: pointer; transition: background 0.15s; }
         tr.clickable:hover { background: var(--primary-light); }
-        .truncate { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .truncate { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         tr.row-expired { background: var(--danger-row) !important; }
         tr.row-expired:hover { background: var(--danger-row-hover) !important; }
@@ -68,6 +81,7 @@
         tr.row-expiring:hover { background: var(--expiring-row-hover) !important; }
         tr.row-no-contact td:nth-child(8) { color: var(--primary); font-weight: 700; }
 
+        /* Badges */
         .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
         .badge-critical { background: var(--primary); color: #fff; }
         .badge-high { background: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
@@ -75,14 +89,30 @@
         .badge-low { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
         .badge-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
 
+        /* Action buttons */
+        .actions-cell { white-space: nowrap; }
+        .btn-action { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 700; text-decoration: none; cursor: pointer; transition: all 0.15s; letter-spacing: 0.02em; }
+        .btn-edit { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(218,33,40,0.2); margin-right: 0.3rem; }
+        .btn-edit:hover { background: var(--primary); color: #fff; }
+        .btn-view { background: #f1f5f9; color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-view:hover { background: var(--text-secondary); color: #fff; }
+
         .empty { text-align: center; color: var(--text-muted); padding: 3rem; font-size: 1.1rem; }
-        @media (max-width: 768px) { .filter-row { flex-direction: column; } .truncate { max-width: 120px; } table { font-size: 0.82rem; } th, td { padding: 0.5rem; } .page-header { padding: 1.25rem 1rem; } .page-header h1 { font-size: 1.25rem; } }
+
+        @media (max-width: 900px) { .page-header { padding: 1rem 1.25rem; } .page-header h1 { font-size: 1.1rem; } .header-link, .header-logout { font-size: 0.78rem; padding: 0.35rem 0.65rem; } }
+        @media (max-width: 768px) { .filter-row { flex-direction: column; } .truncate { max-width: 120px; } table { font-size: 0.8rem; } th, td { padding: 0.5rem; } }
     </style>
 </head>
 <body>
     <div class="page-header">
-        <h1>Access Records Dashboard</h1>
-        <div class="subtitle">System access overview for HR / IT administration</div>
+        <div class="header-left">
+            <h1>Access Records Dashboard</h1>
+            <div class="subtitle">System access overview for HR / IT administration</div>
+        </div>
+        <div class="header-right">
+            <a href="admins.html" class="header-link">Manage Admins</a>
+            <button class="header-logout" onclick="window.location='login.html'">Sign Out</button>
+        </div>
     </div>
 
     <div class="container">
@@ -119,14 +149,15 @@
             </div>
         </div>
 
-        <p class="record-count" id="recordCount">Showing 5 record(s)</p>
+        <p class="record-count" id="recordCount"></p>
 
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
                         <th>Full Name</th><th>Department</th><th>System</th><th>Access</th>
-                        <th>Business Reason</th><th>Start</th><th>End</th><th>Secondary Contact</th><th>Criticality</th>
+                        <th>Business Reason</th><th>Start</th><th>End</th>
+                        <th>Secondary Contact</th><th>Criticality</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -146,17 +177,16 @@
         var today = new Date(); today.setHours(0,0,0,0);
         var in30 = new Date(today); in30.setDate(in30.getDate() + 30);
 
-        function getRowClass(item) {
+        function getRowClass(r) {
             var cls = [];
-            if (item.end) { var ed = new Date(item.end); if (ed < today) cls.push('row-expired'); else if (ed < in30) cls.push('row-expiring'); }
-            if (!item.contact) cls.push('row-no-contact');
+            if (r.end) { var ed = new Date(r.end); if (ed < today) cls.push('row-expired'); else if (ed < in30) cls.push('row-expiring'); }
+            if (!r.contact) cls.push('row-no-contact');
             return cls.join(' ');
         }
-        function truncate(s, n) { return s.length > n ? s.substring(0, n) + '...' : s; }
-        function critBadge(level) {
-            if (!level) return '';
-            var cls = 'badge-' + level.toLowerCase();
-            return '<span class="badge ' + cls + '">' + level + '</span>';
+        function trunc(s, n) { return s.length > n ? s.slice(0,n)+'...' : s; }
+        function critBadge(l) {
+            if (!l) return '';
+            return '<span class="badge badge-'+l.toLowerCase()+'">'+l+'</span>';
         }
 
         function renderTable(items) {
@@ -165,20 +195,24 @@
             items.forEach(function(r) {
                 var tr = document.createElement('tr');
                 tr.className = getRowClass(r) + ' clickable';
-                tr.onclick = function() { window.location = 'details.html?id=' + r.id; };
+                tr.onclick = function() { window.location = 'details.html?id='+r.id; };
                 tr.innerHTML =
-                    '<td>' + r.fullName + '</td>' +
-                    '<td>' + r.department + '</td>' +
-                    '<td>' + r.system + '</td>' +
-                    '<td>' + r.access + '</td>' +
-                    '<td class="truncate">' + truncate(r.reason, 60) + '</td>' +
-                    '<td>' + (r.start || '') + '</td>' +
-                    '<td>' + (r.end || '') + '</td>' +
-                    '<td>' + (r.contact ? r.contact : '<span class="badge badge-warn">Missing</span>') + '</td>' +
-                    '<td>' + critBadge(r.criticality) + '</td>';
+                    '<td>'+r.fullName+'</td>'+
+                    '<td>'+r.department+'</td>'+
+                    '<td>'+r.system+'</td>'+
+                    '<td>'+r.access+'</td>'+
+                    '<td class="truncate">'+trunc(r.reason,60)+'</td>'+
+                    '<td>'+(r.start||'')+'</td>'+
+                    '<td>'+(r.end||'')+'</td>'+
+                    '<td>'+(r.contact||'<span class="badge badge-warn">Missing</span>')+'</td>'+
+                    '<td>'+critBadge(r.criticality)+'</td>'+
+                    '<td class="actions-cell" onclick="event.stopPropagation()">'+
+                      '<a href="edit.html?id='+r.id+'" class="btn-action btn-edit">Edit</a>'+
+                      '<a href="details.html?id='+r.id+'" class="btn-action btn-view">View</a>'+
+                    '</td>';
                 tb.appendChild(tr);
             });
-            document.getElementById('recordCount').textContent = 'Showing ' + items.length + ' record(s)';
+            document.getElementById('recordCount').textContent = 'Showing '+items.length+' record(s)';
         }
 
         function applyFilters() {
